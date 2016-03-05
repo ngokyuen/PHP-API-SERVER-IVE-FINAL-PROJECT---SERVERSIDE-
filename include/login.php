@@ -1,7 +1,5 @@
 <?php
 
-
-if (isset($_POST) && isset($_POST["action"]) && $_POST["action"] == "login"){
     
     $username = isset($_POST['username']) ? mysql_real_escape_string($_POST['username']) : "";
 	$password = isset($_POST['password']) ? mysql_real_escape_string($_POST['password']) : "";
@@ -23,7 +21,6 @@ if (isset($_POST) && isset($_POST["action"]) && $_POST["action"] == "login"){
     
     echo 
          json_encode($response);
-}
 
 
 ?>
