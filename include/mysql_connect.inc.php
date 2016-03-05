@@ -1,4 +1,3 @@
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <?php
 //資料庫設定
 //資料庫位置
@@ -11,13 +10,10 @@ $db_user = "root";
 $db_passwd = "root";
 
 //對資料庫連線
-if(!@mysql_connect($db_server, $db_user, $db_passwd))
+if(! $SQL = mysqli_connect($db_server, $db_user, $db_passwd, $db_name))
         die("無法對資料庫連線");
 
 //資料庫連線採UTF8
-mysql_query("SET NAMES utf8");
+mysqli_query($SQL, "SET NAMES utf8");
 
-//選擇資料庫
-if(!@mysql_select_db($db_name))
-        die("無法使用資料庫");
 ?> 

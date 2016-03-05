@@ -1,6 +1,6 @@
 <?php 
-
-require_once("mysql_connect.inc.php");
+header('Content-Type: application/json; charset=utf-8');
+require_once("./include/mysql_connect.inc.php");
 
 if (isset($_POST) && isset($_POST["action"])){
     switch ($_POST["action"]) {
@@ -8,9 +8,7 @@ if (isset($_POST) && isset($_POST["action"])){
             require_once("./include/login.php");
             break;
     }
-} else {
+} else
     exit("No access to site");
-}
-
 
 ?>

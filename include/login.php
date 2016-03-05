@@ -1,22 +1,19 @@
 <?php
 
-    
-    $username = isset($_POST['username']) ? mysql_real_escape_string($_POST['username']) : "";
-	$password = isset($_POST['password']) ? mysql_real_escape_string($_POST['password']) : "";
-    
+    $username = isset($_POST['username']) ? mysqli_real_escape_string($SQL, $_POST['username']) : "";
+	$password = isset($_POST['password']) ? mysqli_real_escape_string($SQL, $_POST['password']) : "";
+
     //搜尋資料庫資料
-    $sql = "SELECT * FROM users where username='$username' and password='$password'";
-    $result = mysql_query($sql);
-    $rows = mysql_fetch_row($result);
-    $response = array();
+    $query = "SELECT * FROM users";
+    //echo $sql;
+    $result = mysqli_query($SQL, $query);
+    $row = mysqli_fetch_assoc($result);
     
     
-    header('Content-type: application/json');
-    
-    if (count($rows) == 0){
+    if (mysqli_num_rows($result) == 0){
          $response = array("result"=>false, "error_code"=>0);
     } else {
-         $response = array("result"=>true, "content"=>array("token"=>$rows[0]["token"]));
+         $response = array("result"=>true, "content"=>array("token"=>$row["token"]));
     }
     
     echo 
