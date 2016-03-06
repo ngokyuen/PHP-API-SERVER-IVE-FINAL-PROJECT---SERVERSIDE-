@@ -26,7 +26,7 @@
   else
   {
     $query = "INSERT INTO `project3b`.`users` (`username`, `password`,`token` ) VALUES ('" . 
-    $username . "', '" . $password . "', '" . $token . "');";
+    "$username', '$password', '$token');";
     
 	$json = array ("result"=>true, "content" => array());
 	$result = mysqli_query($SQL, $query);

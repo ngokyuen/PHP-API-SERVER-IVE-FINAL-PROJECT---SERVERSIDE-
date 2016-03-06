@@ -4,7 +4,7 @@
 	$password = isset($_POST['password']) ? mysqli_real_escape_string($SQL, $_POST['password']) : "";
 
     //搜尋資料庫資料
-    $query = "SELECT * FROM users WHERE username='" . $username . "' AND password='" . $password . "'";
+    $query = "SELECT * FROM users WHERE username='$username' AND password='$password'";
     //echo $query;
     $result = mysqli_query($SQL, $query);
     $row = mysqli_fetch_assoc($result);
