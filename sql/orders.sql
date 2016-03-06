@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost:3306
--- Generation Time: Mar 06, 2016 at 07:12 AM
+-- Generation Time: Mar 06, 2016 at 02:06 PM
 -- Server version: 5.5.42
 -- PHP Version: 7.0.0
 
@@ -23,6 +23,7 @@ SET time_zone = "+00:00";
 CREATE TABLE `orders` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
+  `type` int(11) NOT NULL DEFAULT '0' COMMENT '0:personal order, 1:car share order',
   `status` int(11) NOT NULL DEFAULT '0' COMMENT '0:pending, 1:completed, 2:cancel',
   `origin` varchar(255) COLLATE utf8_bin NOT NULL,
   `destination` varchar(255) COLLATE utf8_bin NOT NULL,
