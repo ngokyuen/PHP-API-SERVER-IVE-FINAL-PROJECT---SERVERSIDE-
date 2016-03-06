@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost:3306
--- Generation Time: Mar 06, 2016 at 07:12 AM
+-- Generation Time: Mar 06, 2016 at 02:21 PM
 -- Server version: 5.5.42
 -- PHP Version: 7.0.0
 
@@ -24,7 +24,7 @@ CREATE TABLE `users_join_orders` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `order_id` int(11) NOT NULL,
-  `status` int(11) NOT NULL DEFAULT '0' COMMENT '0:join, 1:cancel',
+  `status` varchar(10) COLLATE utf8_bin NOT NULL COMMENT 'join, cancel',
   `created_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
