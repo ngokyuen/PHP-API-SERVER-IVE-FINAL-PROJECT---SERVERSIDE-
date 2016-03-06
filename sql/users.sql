@@ -1,9 +1,44 @@
+←
+phpMyAdmin
+HomephpMyAdmin documentationDocumentationReload navigation panel
+RecentFavorites
+Collapse allUnlink from main panel
+New
+Expand/CollapseDatabase operationsinformation_schema
+Expand/CollapseDatabase operationsmysql
+Expand/CollapseDatabase operationsperformance_schema
+Database operationsproject3b
+NewNew
+Expand/CollapseStructureorders
+Expand/CollapseStructureusers
+Expand/CollapseStructureusers_join_orders
+Database operationsroot
+Server: localhost:3306 »Database: project3b »Table: users
+Browse Browse
+Structure Structure
+SQL SQL
+Search Search
+Insert Insert
+Export Export
+Import Import
+Privileges Privileges
+Operations Operations
+Triggers Triggers
+Click on the bar to scroll to top of page
+SQL Query ConsoleConsole
+OptionsSet default
+Always expand query messages
+Show query history at start
+Show current browsing query
+[ Back ]
+
+
 -- phpMyAdmin SQL Dump
 -- version 4.4.10
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost:3306
--- Generation Time: Mar 05, 2016 at 03:32 PM
+-- Generation Time: Mar 06, 2016 at 07:10 AM
 -- Server version: 5.5.42
 -- PHP Version: 7.0.0
 
@@ -48,18 +83,6 @@ ALTER TABLE `users`
 --
 ALTER TABLE `users`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+[ Back ]
 
---
--- Dumping data for table `users`
---
-
-INSERT INTO `users` (`ID`, `username`, `password`, `token`) VALUES
-(1, 99662234, '99662233',  '529ed0e2c69cf99864ac7f3fb963f336'),
-(2, 99662234, '99662233', '46b14b51f4178e97cf3df5003c28d425'),
-(3, 99662234, '99662233',  'b3e79be2fa6175e6586d28d78e2aa048'),
-(4, 99662234, '99662233', '442a8d7d3efeeffb922f995b71358702'),
-(5, 99662234, '99662233',  '2cc0f32ada0a82465631911f72b43a8f');
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+Open new phpMyAdmin window
