@@ -10,6 +10,9 @@ if (isset($_POST) && isset($_POST["action"])){
         case 'register':
             require_once("./include/register.php");
             break;
+        case 'order':
+            require_once("./include/order.php");
+            break;
     }
 } else
     exit("No access to site");
