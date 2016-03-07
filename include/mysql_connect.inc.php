@@ -5,9 +5,9 @@ $db_server = "localhost";
 //資料庫名稱
 $db_name = "project3b";
 //資料庫管理者帳號
-$db_user = "root";
+$db_user = "project3b";
 //資料庫管理者密碼
-$db_passwd = "root";
+$db_passwd = "project3b";
 
 //對資料庫連線
 if(! $SQL = mysqli_connect($db_server, $db_user, $db_passwd, $db_name))
