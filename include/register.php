@@ -19,7 +19,7 @@
   if (mysqli_num_rows($result) != 0)
   {	
   //顯示訊息要求使用者更換帳號名稱
-	$json = array ("result" => false, error_code => "username duplicate!");
+	$json = array ("result" => false, "error_code" => "username duplicate!");
   }
 	
   //如果帳號沒人使用
