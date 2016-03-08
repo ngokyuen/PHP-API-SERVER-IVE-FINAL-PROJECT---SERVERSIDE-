@@ -8,7 +8,7 @@ class Job {
         $this->SQL = $SQL;
     }
     
-    function addNormalOrder(){
+    function addOrder(){
         $type = isset($_POST['type']) ? mysqli_real_escape_string($this->SQL, $_POST['type']) : "";
         $origin = isset($_POST['origin']) ? mysqli_real_escape_string($this->SQL, $_POST['origin']) : "";
 	    $origin_remark = isset($_POST['origin_remark']) ? mysqli_real_escape_string($this->SQL, $_POST['origin_remark']) : "";
