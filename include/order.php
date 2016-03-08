@@ -9,6 +9,7 @@ class Job {
     }
     
     function addNormalOrder(){
+        $type = isset($_POST['type']) ? mysqli_real_escape_string($this->SQL, $_POST['type']) : "";
         $origin = isset($_POST['origin']) ? mysqli_real_escape_string($this->SQL, $_POST['origin']) : "";
 	    $origin_remark = isset($_POST['origin_remark']) ? mysqli_real_escape_string($this->SQL, $_POST['origin_remark']) : "";
         $destination = isset($_POST['destination']) ? mysqli_real_escape_string($this->SQL, $_POST['destination']) : "";
@@ -28,8 +29,12 @@ class Job {
             $user_id = $row["id"];   
         }
         
-        $query = "INSERT INTO orders (user_id, origin, destination, origin_remark" .
-        ", destination_remark, book_date, passenger, contact_person, contact_no) VALUES ($user_id" .
+        if ($type == ""){
+            $type = "normal";
+        }
+        
+        $query = "INSERT INTO orders (type, user_id, origin, destination, origin_remark" .
+        ", destination_remark, book_date, passenger, contact_person, contact_no) VALUES ('$type', $user_id" .
         ",'$origin', '$destination', '$origin_remark'" .
         ", '$destination_remark', '$book_date', $passenger, '$contact_person', $contact_no);";
         
@@ -50,8 +55,8 @@ if (isset($_POST["action2"])){
     $job = new Job($SQL);
     
     switch($_POST["action2"]){
-        case "addNormalOrder":
-            $response = $job->addNormalOrder();
+        case "addOrder":
+            $response = $job->addOrder();
         break;
     }
 }
