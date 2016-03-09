@@ -18,8 +18,7 @@ class Job {
 	    $passenger = isset($_POST['passenger']) ? mysqli_real_escape_string($this->SQL, $_POST['passenger']) : "";
         $contact_person = isset($_POST['contact_person']) ? mysqli_real_escape_string($this->SQL, $_POST['contact_person']) : "";
 	    $contact_no = isset($_POST['contact_no']) ? mysqli_real_escape_string($this->SQL, $_POST['contact_no']) : "";
-        //$type = isset($_POST['type']) ? mysqli_real_escape_string($this->SQL, $_POST['type']) : "";
-	    $token = isset($_POST['token']) ? mysqli_real_escape_string($this->SQL, $_POST['token']) : "";
+        $token = isset($_POST['token']) ? mysqli_real_escape_string($this->SQL, $_POST['token']) : "";
         $user_id = "";
         
         if ($token != ""){
@@ -35,7 +34,7 @@ class Job {
         
         $query = "INSERT INTO orders (type, user_id, origin, destination, origin_remark" .
         ", destination_remark, book_date, passenger, contact_person, contact_no) VALUES ('$type', " .
-        (($user_id) ? 'NULL' : $user_id) .
+        (($user_id) ? $user_id :'NULL') .
         ",'$origin', '$destination', '$origin_remark'" .
         ", '$destination_remark', '$book_date', $passenger, '$contact_person', $contact_no);";
         
