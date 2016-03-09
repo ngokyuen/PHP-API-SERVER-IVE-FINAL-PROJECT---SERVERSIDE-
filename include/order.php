@@ -41,8 +41,8 @@ class Job {
         //echo $query;
         $result = mysqli_query($this->SQL, $query);
         
-        if (mysqli_insert_id($this->SQL))
-            return array("result"=>true);
+        if ($order_id = mysqli_insert_id($this->SQL))
+            return array("result"=>true, "order_id"=>$order_id);
         else
             return array("result"=>false);
     }
