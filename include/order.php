@@ -35,7 +35,7 @@ class Job {
         
         $query = "INSERT INTO orders (type, user_id, origin, destination, origin_remark" .
         ", destination_remark, book_date, passenger, contact_person, contact_no) VALUES ('$type', " .
-        $user_id ? 'NULL' : $user_id .
+        (($user_id) ? 'NULL' : $user_id) .
         ",'$origin', '$destination', '$origin_remark'" .
         ", '$destination_remark', '$book_date', $passenger, '$contact_person', $contact_no);";
         
