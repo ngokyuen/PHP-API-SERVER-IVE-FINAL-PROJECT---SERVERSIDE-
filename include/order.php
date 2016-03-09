@@ -20,7 +20,7 @@ class Job {
 	    $contact_no = isset($_POST['contact_no']) ? mysqli_real_escape_string($this->SQL, $_POST['contact_no']) : "";
         //$type = isset($_POST['type']) ? mysqli_real_escape_string($this->SQL, $_POST['type']) : "";
 	    $token = isset($_POST['token']) ? mysqli_real_escape_string($this->SQL, $_POST['token']) : "";
-        $user_id = "";
+        $user_id = NULL;
         
         if ($token != ""){
             $query = "SELECT * FROM users WHERE token ='$token';";
