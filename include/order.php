@@ -81,7 +81,7 @@ class Job {
 		$query = "SELECT id, type, book_date, origin, destination, passenger, status FROM orders Order BY book_date LIMIT 5;";
 		if ($result = mysqli_query($this->SQL, $query)) {
 			//loop begin
-			while ($order_id = mysqli_fetch_field($result)) {
+			while ($order_id = mysqli_fetch_array($result)) { //change to _array, non-finish
 				return array("id"=>$id);
 				return array("type"=>$type);
 				return array("book_date"=>$book_date);
