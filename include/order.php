@@ -80,7 +80,6 @@ class Job {
 		//loop get data limit 5 orders
 		$query = "SELECT id, type, book_date, origin, destination, passenger, status FROM orders Order BY book_date LIMIT 5;";
 		if ($result = mysqli_query($this->SQL, $query)) {
-			return array ("result"=>true);
 			//loop begin
 			while ($order_id = mysqli_fetch_field($result)) {
 				return array("id"=>$id);
@@ -92,10 +91,41 @@ class Job {
 				return array("status"=>$status);
 		}
 			mysqli_free_result($result);
+			return array ("result"=>true);
         else
             return array("result"=>false);
 	}
 }
+
+	//2016-03-11
+	//modifyGeneralOrderDistrict - non-finish
+	function modifyGeneralOrderDistrict() {
+		$token = isset($_POST['token']) ? mysqli_real_escape_string($this->SQL, $_POST['token']) : ""; //client send
+		$id = isset($_POST['id']) ? mysqli_real_escape_string($this->SQL, $_POST['id']) : ""; //client send
+		
+		//get token
+		if ($token != ""){
+            $query = "SELECT * FROM users WHERE token ='$token';";
+            $result = mysqli_query($this->SQL, $query);
+            $row = mysqli_fetch_assoc($result);
+            //$user_id = $row["id"];   
+        }
+		
+		//loop get data check status != 'completed' OR 'cancel' (limit 5), if pending return true
+		if ($status != 'completed' || $status != 'cancel'){ //pending return true, exec data (limit 5)
+			$query = "SELECT  status, book_date, origin, destination FROM orders Order BY book_date LIMIT 5;";
+			$result = mysqli_query($this->SQL, $query);
+		} 
+		else 
+		{
+			return array("result"=>false);
+		}
+		//non-finish
+	$query = "UPDATE orders SET origin='".$_POST['origin']."', destination='".$_POST['destination']."' where id = '$id';";
+	return array("result"=>true);
+
+	
+	}
 
 //response variable
 $response = array();
@@ -113,7 +143,9 @@ if (isset($_POST["action2"])){
 		case "getGeneralOrder"; //2016-03-10
 			$response = $job->getGeneralOrder();
 		break;
-			
+		case "modifyGeneralOrderDistrict"; //2016-03-11
+			$respone = $job->modifyGeneralOrder();
+		break;
     }
 }
 
