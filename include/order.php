@@ -13,6 +13,7 @@ class Job {
     private $contact_person;
 	private $contact_no;
     private $token;
+    private $user_id;
     
     function Job($SQL){
         $this->SQL = $SQL;
@@ -29,8 +30,11 @@ class Job {
             $user_id = $row["id"];   
         }
         
+        if ($this->type == "")
+            $type = 'normal';
+        
         $query = "INSERT INTO orders (type, user_id, origin, destination, origin_remark" .
-        ", destination_remark, book_date, passenger, contact_person, contact_no) VALUES ('$this->type', " .
+        ", destination_remark, book_date, passenger, contact_person, contact_no) VALUES ('$type', " .
         (($user_id) ? $user_id :'NULL') .
         ",'$this->origin', '$this->destination', '$this->origin_remark'" .
         ", '$this->destination_remark', '$this->book_date', $this->passenger, '$this->contact_person', $this->contact_no);";
@@ -61,8 +65,47 @@ class Job {
     }
     
     //13 March 2016 Ted
-    function getOrder(){
+    function getOrder($condition){
+        $query = "SELECT * FROM orders";
         
+        $query2 = $this->type ? $this->type : "";
+        $query2 += $this->origin ? $this->origin : "";
+        $query2 += $this->origin_remark ? $this->origin_remark : "";
+        $query2 += $this->destination ? $this->destination : "";
+        $query2 += $this->destination_remark ? $this->destination_remark : "";
+        $query2 += $this->book_date ? $this->book_date : "";
+        $query2 += $this->passenger ? $this->passenger : "";
+        $query2 += $this->contact_person ? $this->contact_person : "";
+        $query2 += $this->contact_no ? $this->contact_person : "";
+        $query2 += $this->token ? $this->contact_person : "";
+        
+        if ($query2)
+            $query += " WHERE " + $query2;
+        
+        if (!$query2)
+            $query += " WHERE " + $condition;
+        else
+            $query += $condition;
+        
+        $items = array();
+	    $result = mysqli_query($this->SQL, $query);
+        while ($row = mysqli_fetch_assoc($result)){
+            $item = array("id"=>$row['id'],
+            "type"=>$row['type'],
+            "book_date"=>$row['book_date'],
+            "origin"=>$row['origin'],
+            "origin"=>$row['origin'],
+            "destination"=>$row['destination'],
+            "passenger"=>$row['passenger'],
+            "status"=>$row['status'],
+            "user_id"=>$row['user_id']);
+            array_push($items, $item);
+        }
+        
+        if ($items.count > 0)
+            return array("result"=>true, "content"=>$items);
+        else
+            return array("result"=>false);
     }
 	
 	//2016-03-10
@@ -130,7 +173,7 @@ class Job {
     //13 March 2016 Ted
     //general post method variable
     function getPost(){
-        $this->type = isset($_POST['type']) ? mysqli_real_escape_string($this->SQL, $_POST['type']) : "normal";
+        $this->type = isset($_POST['type']) ? mysqli_real_escape_string($this->SQL, $_POST['type']) : "";
         $this->origin = isset($_POST['origin']) ? mysqli_real_escape_string($this->SQL, $_POST['origin']) : "";
 	    $this->origin_remark = isset($_POST['origin_remark']) ? mysqli_real_escape_string($this->SQL, $_POST['origin_remark']) : "";
         $this->destination = isset($_POST['destination']) ? mysqli_real_escape_string($this->SQL, $_POST['destination']) : "";
@@ -146,6 +189,7 @@ class Job {
 
 if (isset($_POST["action2"])){
     $job = new Job($SQL);
+    $job->getOrder();
     
     switch($_POST["action2"]){
         case "addOrder":
