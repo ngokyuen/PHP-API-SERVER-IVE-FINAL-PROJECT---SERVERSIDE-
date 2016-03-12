@@ -3,22 +3,23 @@
 //build class
 class Job {
     private $SQL;
+    private $type;
+    private $origin;
+	private $origin_remark;
+    private $destination;
+	private $destination_remark;
+    private $book_date;
+	private $passenger;
+    private $contact_person;
+	private $contact_no;
+    private $token;
     
     function Job($SQL){
         $this->SQL = $SQL;
     }
     
     function addOrder(){
-        $type = isset($_POST['type']) ? mysqli_real_escape_string($this->SQL, $_POST['type']) : "";
-        $origin = isset($_POST['origin']) ? mysqli_real_escape_string($this->SQL, $_POST['origin']) : "";
-	    $origin_remark = isset($_POST['origin_remark']) ? mysqli_real_escape_string($this->SQL, $_POST['origin_remark']) : "";
-        $destination = isset($_POST['destination']) ? mysqli_real_escape_string($this->SQL, $_POST['destination']) : "";
-	    $destination_remark = isset($_POST['destination_remark']) ? mysqli_real_escape_string($this->SQL, $_POST['destination_remark']) : "";
-        $book_date = isset($_POST['book_date']) ? mysqli_real_escape_string($this->SQL, $_POST['book_date']) : "";
-	    $passenger = isset($_POST['passenger']) ? mysqli_real_escape_string($this->SQL, $_POST['passenger']) : "";
-        $contact_person = isset($_POST['contact_person']) ? mysqli_real_escape_string($this->SQL, $_POST['contact_person']) : "";
-	    $contact_no = isset($_POST['contact_no']) ? mysqli_real_escape_string($this->SQL, $_POST['contact_no']) : "";
-        $token = isset($_POST['token']) ? mysqli_real_escape_string($this->SQL, $_POST['token']) : "";
+        $this->getPost();
         $user_id = "";
         
         if ($token != ""){
@@ -28,21 +29,17 @@ class Job {
             $user_id = $row["id"];   
         }
         
-        if ($type == ""){
-            $type = "normal";
-        }
-        
         $query = "INSERT INTO orders (type, user_id, origin, destination, origin_remark" .
-        ", destination_remark, book_date, passenger, contact_person, contact_no) VALUES ('$type', " .
+        ", destination_remark, book_date, passenger, contact_person, contact_no) VALUES ('$this->type', " .
         (($user_id) ? $user_id :'NULL') .
-        ",'$origin', '$destination', '$origin_remark'" .
-        ", '$destination_remark', '$book_date', $passenger, '$contact_person', $contact_no);";
+        ",'$this->origin', '$this->destination', '$this->origin_remark'" .
+        ", '$this->destination_remark', '$this->book_date', $this->passenger, '$this->contact_person', $this->contact_no);";
         
         //echo $query;
         $result = mysqli_query($this->SQL, $query);
         
         if ($order_id = mysqli_insert_id($this->SQL))
-            return array("result"=>true, "order_id"=>$order_id);
+            return array("result"=>true, "order_id"=>$this->order_id);
         else
             return array("result"=>false);
     }
@@ -61,6 +58,11 @@ class Job {
             return array("result"=>true);
         else
             return array("result"=>false);
+    }
+    
+    //13 March 2016 Ted
+    function getOrder(){
+        
     }
 	
 	//2016-03-10
@@ -124,6 +126,21 @@ class Job {
 
 	
 	}
+    
+    //13 March 2016 Ted
+    //general post method variable
+    function getPost(){
+        $this->type = isset($_POST['type']) ? mysqli_real_escape_string($this->SQL, $_POST['type']) : "normal";
+        $this->origin = isset($_POST['origin']) ? mysqli_real_escape_string($this->SQL, $_POST['origin']) : "";
+	    $this->origin_remark = isset($_POST['origin_remark']) ? mysqli_real_escape_string($this->SQL, $_POST['origin_remark']) : "";
+        $this->destination = isset($_POST['destination']) ? mysqli_real_escape_string($this->SQL, $_POST['destination']) : "";
+	    $this->destination_remark = isset($_POST['destination_remark']) ? mysqli_real_escape_string($this->SQL, $_POST['destination_remark']) : "";
+        $this->book_date = isset($_POST['book_date']) ? mysqli_real_escape_string($this->SQL, $_POST['book_date']) : "";
+	    $this->passenger = isset($_POST['passenger']) ? mysqli_real_escape_string($this->SQL, $_POST['passenger']) : "";
+        $this->contact_person = isset($_POST['contact_person']) ? mysqli_real_escape_string($this->SQL, $_POST['contact_person']) : "";
+	    $this->contact_no = isset($_POST['contact_no']) ? mysqli_real_escape_string($this->SQL, $_POST['contact_no']) : "";
+        $this->token = isset($_POST['token']) ? mysqli_real_escape_string($this->SQL, $_POST['token']) : "";
+    }
 }
 
 
