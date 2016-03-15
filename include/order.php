@@ -62,7 +62,7 @@ class Job {
 		$query = "UPDATE orders SET status ='cancel' where id = '$id';";
 		$result = mysqli_query($this->SQL, $query);
         
-        if ($order_id = mysqli_insert_id($this->SQL))
+        if (mysqli_affected_rows($this->SQL) > 0)
             return array("result"=>true);
         else
             return array("result"=>false);
