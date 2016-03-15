@@ -83,6 +83,8 @@ class Job {
         $query2 .= cmdAddCond($query2, "and","equal", array("passenger", $this->passenger));
         $query2 .= cmdAddCond($query2, "and","like", array("contact_person",$this->contact_person));
         $query2 .= cmdAddCond($query2, "and","like", array("contact_no",$this->contact_no));
+        $query2 .= cmdAddCond($query2, "and","equal", array("status",$this->status));
+        
         if ($query2)
             $query .= " WHERE " . $query2 . " " . $condition;
         else if ($condition)
