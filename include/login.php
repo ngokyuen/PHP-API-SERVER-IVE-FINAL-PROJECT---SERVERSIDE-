@@ -13,7 +13,7 @@
     if (mysqli_num_rows($result) == 0){
          $response = array("result"=>false, "error_code"=>0);
     } else {
-         $response = array("result"=>true, "content"=>array("token"=>$row["token"]));
+         $response = array("result"=>true, "content"=>array("token"=>$row["token"], "id"=>$row["id"]));
     }
     
     echo 
