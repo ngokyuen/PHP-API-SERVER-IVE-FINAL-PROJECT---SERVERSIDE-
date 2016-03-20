@@ -13,6 +13,9 @@ if (isset($_POST) && isset($_POST["action"])){
         case 'order':
             require_once("./include/order.php");
             break;
+        case 'profile':
+            require_once("./include/profile.php");
+            break;
     }
 } else
     exit("No access to site");
