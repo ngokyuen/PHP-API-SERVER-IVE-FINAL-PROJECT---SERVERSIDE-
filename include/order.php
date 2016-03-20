@@ -60,9 +60,9 @@ class Job {
 		//non-finish validation
 		//switch case
 		$query = "UPDATE orders SET status ='cancel' where id = '$id';";
-		$result = mysqli_query($this->SQL, $query);
+		//$result = mysqli_query($this->SQL, $query);
         
-        if (mysqli_affected_rows($this->SQL) > 0)
+        if (mysqli_query($this->SQL, $query))
             return array("result"=>true);
         else
             return array("result"=>false);
