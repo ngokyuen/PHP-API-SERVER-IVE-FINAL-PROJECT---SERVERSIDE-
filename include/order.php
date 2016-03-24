@@ -1,7 +1,7 @@
 <?php
 
 //build class
-class Job {
+class order {
     private $SQL;
     private $type;
     private $origin;
@@ -19,8 +19,29 @@ class Job {
     private $status;
     private $id;
     
-    function Job($SQL){
+    function order($SQL){
         $this->SQL = $SQL;
+    }
+    
+    function modifyOrder(){
+        $this->getPost();
+        $query = "UPDATE orders SET " .
+        " origin='" .  $this->origin . "'," .
+	    " origin_remark='" .  $this->origin_remark . "'," .
+        " destination='" .  $this->destination . "'," .
+        " destination_remark='" .  $this->destination_remark . "'," .
+        " book_date='" .  $this->book_date . "'," .
+        " passenger='" .  $this->passenger . "'," .
+        " contact_person='" .  $this->contact_person . "'," .
+        " contact_no='" .  $this->contact_no . "'," .
+        " origin_remark='" .  $this->origin_remark . "'" .
+        " WHERE id=" . $this->id;
+        //echo $query;
+        if (mysqli_query($this->SQL, $query))
+            return array("result"=>true);
+        else
+            return array("result"=>false);
+        
     }
     
     function addOrder(){
@@ -221,24 +242,27 @@ function cmdAddCond($cond_query, $cmd, $cmd2, $conds){
 
 
 if (isset($_POST["action2"])){
-    $job = new Job($SQL);
-    //$job->getOrder();
+    $order = new order($SQL);
+    //$order->getOrder();
     
     switch($_POST["action2"]){
+        case "modifyOrder":
+            $response = $order->modifyOrder();
+        break;
         case "addOrder":
-            $response = $job->addOrder();
+            $response = $order->addOrder();
         break;
 		case "removeOrder": //2016-03-09
-			$response = $job->removeOrder();
+			$response = $order->removeOrder();
 		break;
         case "getOrder":
-            $response = $job->getOrder();
+            $response = $order->getOrder();
         break;
 		case "getGeneralOrder": //2016-03-10
-			$response = $job->getGeneralOrder();
+			$response = $order->getGeneralOrder();
 		break;
 		case "modifyGeneralOrderDistrict": //2016-03-11
-			$respone = $job->modifyGeneralOrder();
+			$respone = $order->modifyGeneralOrder();
 		break;
     }
 }
