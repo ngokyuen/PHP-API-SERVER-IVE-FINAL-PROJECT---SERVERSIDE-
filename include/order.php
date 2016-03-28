@@ -23,6 +23,31 @@ class order {
         $this->SQL = $SQL;
     }
     
+    function getJoinShareOrder(){
+        $this->getPost();
+        $query = "SELECT * FROM orders o WHERE " .
+        " o.type='share' AND o.status='pending' " .
+        " AND (o.user_id=$this->user_id " .
+        " OR (SELECT 1 FROM users_join_orders uo WHERE " .
+        " uo.user_id=$this->user_id " .
+        " AND uo.order_id =o.id))";
+        //echo $query;
+        $items = $this->returnOrders($query);
+        //print_r($items);
+        if (count($items) > 0)
+            return array("result"=>true, "content"=>$items);
+        else
+            return array("result"=>false);
+    }
+    
+    function getNearShareOrder(){
+        $this->getPost();
+    }
+    
+    function getOtherShareOrder(){
+        $this->getPost();
+    }
+    
     function modifyOrder(){
         $this->getPost();
         $query = "UPDATE orders SET " .
@@ -46,21 +71,13 @@ class order {
     
     function addOrder(){
         $this->getPost();
-        $user_id = "";
-        
-        if ($token != ""){
-            $query = "SELECT * FROM users WHERE token ='$token';";
-            $result = mysqli_query($this->SQL, $query);
-            $row = mysqli_fetch_assoc($result);
-            $user_id = $row["id"];   
-        }
         
         if ($this->type == "")
-            $type = 'normal';
+            $this->type = 'normal';
         
         $query = "INSERT INTO orders (type, user_id, origin, destination, origin_remark" .
-        ", destination_remark, book_date, passenger, contact_person, contact_no) VALUES ('$type', " .
-        (($user_id) ? $user_id :'NULL') .
+        ", destination_remark, book_date, passenger, contact_person, contact_no) VALUES ('$this->type', " .
+        (($this->user_id) ? $this->user_id :'NULL') .
         ",'$this->origin', '$this->destination', '$this->origin_remark'" .
         ", '$this->destination_remark', '$this->book_date', $this->passenger, '$this->contact_person', $this->contact_no);";
         
@@ -68,7 +85,7 @@ class order {
         $result = mysqli_query($this->SQL, $query);
         
         if ($order_id = mysqli_insert_id($this->SQL))
-            return array("result"=>true, "order_id"=>$this->order_id);
+            return array("result"=>true);
         else
             return array("result"=>false);
     }
@@ -105,31 +122,14 @@ class order {
         $query2 .= cmdAddCond($query2, "and","like", array("contact_person",$this->contact_person));
         $query2 .= cmdAddCond($query2, "and","like", array("contact_no",$this->contact_no));
         $query2 .= cmdAddCond($query2, "and","equal", array("status",$this->status));
+        $query2 .= cmdAddCond($query2, "and","equal", array("user_id",$this->user_id));
         
         if ($query2)
             $query .= " WHERE " . $query2 . " " . $condition;
         else if ($condition)
             $query .= $condition;
         
-        $items = array();
-	    $result = mysqli_query($this->SQL, $query);
-        while ($row = mysqli_fetch_assoc($result)){
-            $item = array("id"=>$row['id'],
-            "type"=>$row['type'],
-            "book_date"=>$row['book_date'],
-            "origin"=>$row['origin'],
-            "origin_remark"=>$row['origin_remark'],
-            "destination"=>$row['destination'],
-            "destination_remark"=>$row['destination_remark'],
-            "passenger"=>$row['passenger'],
-            "contact_person"=>$row['contact_person'],
-            "contact_no"=>$row['contact_no'],
-            "created_date"=>$row['created_date'],
-            "modified_date"=>$row['modified_date'],
-            "status"=>$row['status'],
-            "user_id"=>$row['user_id']);
-            array_push($items, $item);
-        }
+        $items = $this->returnOrders($query);
         //print_r($items);
         if (count($items) > 0)
             return array("result"=>true, "content"=>$items);
@@ -168,7 +168,6 @@ class order {
             return array("result"=>false);
 	}
 
-
 	//2016-03-11
 	//modifyGeneralOrderDistrict - non-finish
 	function modifyGeneralOrderDistrict() {
@@ -195,12 +194,12 @@ class order {
 		//non-finish
 	$query = "UPDATE orders SET origin='".$_POST['origin']."', destination='".$_POST['destination']."' where id = '$id';";
 	return array("result"=>true);
-
 	}
     
     //13 March 2016 Ted
     //general post method variable
     function getPost(){
+        //$this->user_id = isset($_POST['user_id']) ? mysqli_real_escape_string($this->SQL, $_POST['user_id']) : "";
         $this->id = isset($_POST['id']) ? mysqli_real_escape_string($this->SQL, $_POST['id']) : "";
         $this->type = isset($_POST['type']) ? mysqli_real_escape_string($this->SQL, $_POST['type']) : "";
         $this->origin = isset($_POST['origin']) ? mysqli_real_escape_string($this->SQL, $_POST['origin']) : "";
@@ -214,6 +213,37 @@ class order {
         $this->created_date = isset($_POST['created_date']) ? mysqli_real_escape_string($this->SQL, $_POST['created_date']) : "";
         $this->status = isset($_POST['status']) ? mysqli_real_escape_string($this->SQL, $_POST['status']) : "";
         $this->token = isset($_POST['token']) ? mysqli_real_escape_string($this->SQL, $_POST['token']) : "";
+        
+        if ($this->token != ""){
+            $query = "SELECT * FROM users WHERE token ='$this->token';";
+            $result = mysqli_query($this->SQL, $query);
+            $row = mysqli_fetch_assoc($result);
+            $this->user_id = $row["id"];   
+        }
+    }
+    
+    function returnOrders($query){
+        $items = array();
+	    $result = mysqli_query($this->SQL, $query);
+        while ($row = mysqli_fetch_assoc($result)){
+            $item = array("id"=>$row['id'],
+            "type"=>$row['type'],
+            "book_date"=>$row['book_date'],
+            "origin"=>$row['origin'],
+            "origin_remark"=>$row['origin_remark'],
+            "destination"=>$row['destination'],
+            "destination_remark"=>$row['destination_remark'],
+            "passenger"=>$row['passenger'],
+            "contact_person"=>$row['contact_person'],
+            "contact_no"=>$row['contact_no'],
+            "created_date"=>$row['created_date'],
+            "modified_date"=>$row['modified_date'],
+            "status"=>$row['status'],
+            "user_id"=>$row['user_id']);
+            array_push($items, $item);
+        }
+        
+        return $items;
     }
 }
 
@@ -240,12 +270,14 @@ function cmdAddCond($cond_query, $cmd, $cmd2, $conds){
      return $result;     
 }
 
-
 if (isset($_POST["action2"])){
     $order = new order($SQL);
     //$order->getOrder();
     
     switch($_POST["action2"]){
+        case "getJoinShareOrder":
+            $response = $order->getJoinShareOrder();
+        break;
         case "modifyOrder":
             $response = $order->modifyOrder();
         break;
