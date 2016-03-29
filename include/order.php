@@ -18,6 +18,12 @@ class order {
     private $modified_date;
     private $status;
     private $id;
+    private $origin_lat;
+    private $origin_lng;
+    private $destination_lat;
+    private $destination_lng;
+    private $current_lng;
+    private $current_lat;
     
     function order($SQL){
         $this->SQL = $SQL;
@@ -42,6 +48,18 @@ class order {
     
     function getNearShareOrder(){
         $this->getPost();
+        $query = "SELECT * FROM orders o WHERE " .
+        " o.type='share' AND o.status='pending' ".
+        " AND (o.origin_lng - $this->current_lng) <= 0.08 ".
+        " AND (o.origin_lng - $this->current_lng) >= -0.08 ".
+        " AND (o.origin_lat - $this->current_lat) <= 0.08 " .
+        " AND (o.origin_lat - $this->current_lat) >= -0.08 ";
+
+        $items = $this->returnOrders($query);
+        if (count($items) > 0)
+            return array("result"=>true, "content"=>$items);
+        else
+            return array("result"=>false);
     }
     
     function getOtherShareOrder(){
@@ -50,6 +68,7 @@ class order {
     
     function modifyOrder(){
         $this->getPost();
+        //$this->updateLatLng();
         $query = "UPDATE orders SET " .
         " origin='" .  $this->origin . "'," .
 	    " origin_remark='" .  $this->origin_remark . "'," .
@@ -59,27 +78,30 @@ class order {
         " passenger='" .  $this->passenger . "'," .
         " contact_person='" .  $this->contact_person . "'," .
         " contact_no='" .  $this->contact_no . "'," .
-        " origin_remark='" .  $this->origin_remark . "'" .
+        " origin_lat='" .  $this->origin_lat . "'," .
+        " origin_lng='" .  $this->origin_lng . "'," .
+        " destination_lat='" .  $this->destination_lat . "', " .
+        " destination_lng='" .  $this->destination_lng . "' " .
         " WHERE id=" . $this->id;
         //echo $query;
         if (mysqli_query($this->SQL, $query))
             return array("result"=>true);
         else
             return array("result"=>false);
-        
     }
     
     function addOrder(){
         $this->getPost();
-        
+        //$this->updateLatLng();
         if ($this->type == "")
             $this->type = 'normal';
         
         $query = "INSERT INTO orders (type, user_id, origin, destination, origin_remark" .
-        ", destination_remark, book_date, passenger, contact_person, contact_no) VALUES ('$this->type', " .
+        ", destination_remark, book_date, passenger, contact_person, contact_no, origin_lat, origin_lng, destination_lat, destination_lng) VALUES ('$this->type', " .
         (($this->user_id) ? $this->user_id :'NULL') .
         ",'$this->origin', '$this->destination', '$this->origin_remark'" .
-        ", '$this->destination_remark', '$this->book_date', $this->passenger, '$this->contact_person', $this->contact_no);";
+        ", '$this->destination_remark', '$this->book_date', $this->passenger, '$this->contact_person', $this->contact_no" . 
+        ", '$this->origin_lat', '$this->origin_lng', '$this->destination_lat', '$this->destination_lng');";
         
         //echo $query;
         $result = mysqli_query($this->SQL, $query);
@@ -192,8 +214,8 @@ class order {
 			return array("result"=>false);
 		}
 		//non-finish
-	$query = "UPDATE orders SET origin='".$_POST['origin']."', destination='".$_POST['destination']."' where id = '$id';";
-	return array("result"=>true);
+        $query = "UPDATE orders SET origin='".$_POST['origin']."', destination='".$_POST['destination']."' where id = '$id';";
+        return array("result"=>true);
 	}
     
     //13 March 2016 Ted
@@ -213,7 +235,12 @@ class order {
         $this->created_date = isset($_POST['created_date']) ? mysqli_real_escape_string($this->SQL, $_POST['created_date']) : "";
         $this->status = isset($_POST['status']) ? mysqli_real_escape_string($this->SQL, $_POST['status']) : "";
         $this->token = isset($_POST['token']) ? mysqli_real_escape_string($this->SQL, $_POST['token']) : "";
-        
+        $this->origin_lat = isset($_POST['origin_lat']) ? mysqli_real_escape_string($this->SQL, $_POST['origin_lat']) : "";
+        $this->origin_lng = isset($_POST['origin_lng']) ? mysqli_real_escape_string($this->SQL, $_POST['origin_lng']) : "";
+        $this->destination_lat = isset($_POST['destination_lat']) ? mysqli_real_escape_string($this->SQL, $_POST['destination_lat']) : "";
+        $this->destination_lng = isset($_POST['destination_lng']) ? mysqli_real_escape_string($this->SQL, $_POST['destination_lng']) : "";
+        $this->current_lng = isset($_POST['current_lng']) ? mysqli_real_escape_string($this->SQL, $_POST['current_lng']) : "";
+        $this->current_lat = isset($_POST['current_lat']) ? mysqli_real_escape_string($this->SQL, $_POST['current_lat']) : "";
         if ($this->token != ""){
             $query = "SELECT * FROM users WHERE token ='$this->token';";
             $result = mysqli_query($this->SQL, $query);
@@ -226,24 +253,63 @@ class order {
         $items = array();
 	    $result = mysqli_query($this->SQL, $query);
         while ($row = mysqli_fetch_assoc($result)){
-            $item = array("id"=>$row['id'],
-            "type"=>$row['type'],
-            "book_date"=>$row['book_date'],
-            "origin"=>$row['origin'],
-            "origin_remark"=>$row['origin_remark'],
-            "destination"=>$row['destination'],
-            "destination_remark"=>$row['destination_remark'],
-            "passenger"=>$row['passenger'],
-            "contact_person"=>$row['contact_person'],
-            "contact_no"=>$row['contact_no'],
-            "created_date"=>$row['created_date'],
-            "modified_date"=>$row['modified_date'],
-            "status"=>$row['status'],
-            "user_id"=>$row['user_id']);
+            $item = array(
+                "id"=>$row['id'],
+                "type"=>$row['type'],
+                "book_date"=>$row['book_date'],
+                "origin"=>$row['origin'],
+                "origin_remark"=>$row['origin_remark'],
+                "destination"=>$row['destination'],
+                "destination_remark"=>$row['destination_remark'],
+                "passenger"=>$row['passenger'],
+                "contact_person"=>$row['contact_person'],
+                "contact_no"=>$row['contact_no'],
+                "created_date"=>$row['created_date'],
+                "modified_date"=>$row['modified_date'],
+                "status"=>$row['status'],
+                "user_id"=>$row['user_id'],
+                "origin_lat"=>$row['origin_lat'],
+                "origin_lng"=>$row['origin_lng'],
+                "destination_lat"=>$row['destination_lat'],
+                "destination_lng"=>$row['destination_lng']);
             array_push($items, $item);
         }
-        
         return $items;
+    }
+    
+    function updateLatLng(){
+        $origin = $this->getLatLng($this->origin);
+        $this->origin_lat = $origin["latitude"];
+        $this->origin_lng = $origin["longitude"];
+        $destination = $this->getLatLng($this->destination);
+        $this->destination_lat = $destination["latitude"];
+        $this->destination_lng = $destination["longitude"];
+    }
+    
+    function getLatLng($address){
+        $details_url = "https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyBdjpXiWO1TH0AgzoMhbzVAqZlQjhFxN8M&address=" . $address;
+        
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $details_url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $response = json_decode(curl_exec($ch), true);
+ 
+        // If Status Code is ZERO_RESULTS, OVER_QUERY_LIMIT, REQUEST_DENIED or INVALID_REQUEST
+        if ($response['status'] != 'OK') {
+            return null;
+        }
+ 
+        $geometry = $response['results'][0]['geometry'];
+        $longitude = $geometry['location']['lng'];
+        $latitude = $geometry['location']['lat'];
+ 
+        $array = array(
+            'latitude' => $geometry['location']['lat'],
+            'longitude' => $geometry['location']['lng'],
+            'location_type' => $geometry['location_type'],
+        );
+ 
+        return $array;
     }
 }
 
@@ -277,6 +343,9 @@ if (isset($_POST["action2"])){
     switch($_POST["action2"]){
         case "getJoinShareOrder":
             $response = $order->getJoinShareOrder();
+        break;
+        case "getNearShareOrder":
+            $response = $order->getNearShareOrder();
         break;
         case "modifyOrder":
             $response = $order->modifyOrder();
