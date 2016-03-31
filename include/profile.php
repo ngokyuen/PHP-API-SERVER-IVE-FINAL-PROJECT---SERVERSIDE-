@@ -12,8 +12,6 @@ class Profile {
     private $id;
     private $token;
     
-    private $result;
-    
     function Profile($sql){
         $this->SQL = $sql;
     }
@@ -28,7 +26,7 @@ class Profile {
         " , address='" . $this->address . "'" . 
         " , address2='" . $this->address2 . "'" . 
         " , sex='" . $this->sex . "'" . 
-        " WHERE token='" . $this->token . "';";
+        " WHERE id='" . $this->id . "';";
         //echo $query;
         //$result = mysqli_query($this->SQL, $query);
         //echo $query;
@@ -40,12 +38,11 @@ class Profile {
     
     function getProfile(){
         $this->getPost();
-        //   $query = "SELECT * FROM users WHERE token='" . $this->token . "';";
-		//   if ($result = mysqli_query($this->SQL, $query)) {
-		//   	$user = mysqli_fetch_array($result);
-		//   	mysqli_free_result($result);
-        if ($this->token != ""){
-			return array ("result"=>true, "content"=>$this->result);
+        $query = "SELECT * FROM users WHERE id='" . $this->id . "';";
+		if ($result = mysqli_query($this->SQL, $query)) {
+			$user = mysqli_fetch_array($result);
+			mysqli_free_result($result);
+			return array ("result"=>true, "content"=>$user);
         } else
             return array("result"=>false);
     }
@@ -60,13 +57,6 @@ class Profile {
         $this->address2 = isset($_POST['address2']) ? mysqli_real_escape_string($this->SQL, $_POST['address2']) : "";
 	    $this->sex = isset($_POST['sex']) ? mysqli_real_escape_string($this->SQL, $_POST['sex']) : "";
         $this->token = isset($_POST['token']) ? mysqli_real_escape_string($this->SQL, $_POST['token']) : "";
-        $this->result = array();
-        if ($this->token != ""){
-            $query = "SELECT * FROM users WHERE token ='".$this->token."';";
-            $result = mysqli_query($this->SQL, $query);
-            $this->result = mysqli_fetch_assoc($result);
-            $this->id = $this->result["id"];
-        }
     }
 }
 
