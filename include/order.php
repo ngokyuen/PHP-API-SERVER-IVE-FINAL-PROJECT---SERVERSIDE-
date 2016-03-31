@@ -64,6 +64,19 @@ class order {
     
     function getOtherShareOrder(){
         $this->getPost();
+        $query = "SELECT * FROM orders o WHERE " .
+        " o.type='share' AND o.status='pending' " .
+        " AND (o.user_id <> $this->user_id " .
+        " AND (SELECT 1 FROM users_join_orders uo WHERE " .
+        " uo.user_id <> $this->user_id " .
+        " AND uo.order_id = o.id))";
+        //echo $query;
+        $items = $this->returnOrders($query);
+        //print_r($items);
+        if (count($items) > 0)
+            return array("result"=>true, "content"=>$items);
+        else
+            return array("result"=>false);
     }
     
     function modifyOrder(){
