@@ -53,7 +53,15 @@ class order {
         " AND (o.origin_lng - $this->current_lng) <= 0.08 ".
         " AND (o.origin_lng - $this->current_lng) >= -0.08 ".
         " AND (o.origin_lat - $this->current_lat) <= 0.08 " .
-        " AND (o.origin_lat - $this->current_lat) >= -0.08 ";
+        " AND (o.origin_lat - $this->current_lat) >= -0.08 " .
+        " AND NOT IN (" .
+        "SELECT o.id FROM orders o WHERE " .
+        " o.type='share' AND o.status='pending' " .
+        " AND (o.user_id=$this->user_id " .
+        " OR (SELECT 1 FROM users_join_orders uo WHERE " .
+        " uo.user_id=$this->user_id " .
+        " AND uo.order_id =o.id))";
+        ");";
 
         $items = $this->returnOrders($query);
         if (count($items) > 0)
@@ -255,7 +263,7 @@ class order {
         $this->current_lng = isset($_POST['current_lng']) ? mysqli_real_escape_string($this->SQL, $_POST['current_lng']) : "";
         $this->current_lat = isset($_POST['current_lat']) ? mysqli_real_escape_string($this->SQL, $_POST['current_lat']) : "";
         if ($this->token != ""){
-            $query = "SELECT * FROM users WHERE token ='$this->token';";
+            $query = "SELECT id FROM users WHERE token ='$this->token';";
             $result = mysqli_query($this->SQL, $query);
             $row = mysqli_fetch_assoc($result);
             $this->user_id = $row["id"];   
@@ -265,26 +273,7 @@ class order {
     function returnOrders($query){
         $items = array();
 	    $result = mysqli_query($this->SQL, $query);
-        while ($row = mysqli_fetch_assoc($result)){
-            $item = array(
-                "id"=>$row['id'],
-                "type"=>$row['type'],
-                "book_date"=>$row['book_date'],
-                "origin"=>$row['origin'],
-                "origin_remark"=>$row['origin_remark'],
-                "destination"=>$row['destination'],
-                "destination_remark"=>$row['destination_remark'],
-                "passenger"=>$row['passenger'],
-                "contact_person"=>$row['contact_person'],
-                "contact_no"=>$row['contact_no'],
-                "created_date"=>$row['created_date'],
-                "modified_date"=>$row['modified_date'],
-                "status"=>$row['status'],
-                "user_id"=>$row['user_id'],
-                "origin_lat"=>$row['origin_lat'],
-                "origin_lng"=>$row['origin_lng'],
-                "destination_lat"=>$row['destination_lat'],
-                "destination_lng"=>$row['destination_lng']);
+        while ($item = mysqli_fetch_assoc($result)){
             array_push($items, $item);
         }
         return $items;
