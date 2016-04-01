@@ -2,7 +2,7 @@
 
 //build class
 class order {
-    private const $MAX_DISTANCE = 0.8;
+    const MAX_DISTANCE = 0.8;
     private $SQL;
     private $type, $origin,$origin_remark;
     private $destination,$destination_remark;
@@ -39,10 +39,10 @@ class order {
         $this->getPost();
         $query = "SELECT * FROM orders o WHERE " .
         " o.type='share' AND o.status='pending' ".
-        " AND (o.origin_lng - $this->current_lng) <= $this->MAX_DISTANCE ".
-        " AND (o.origin_lng - $this->current_lng) >= -($this->MAX_DISTANC) ".
-        " AND (o.origin_lat - $this->current_lat) <= $this->MAX_DISTANC " .
-        " AND (o.origin_lat - $this->current_lat) >= -($this->MAX_DISTANC) " .
+        " AND (o.origin_lng - $this->current_lng) <= " . self::MAX_DISTANCE .
+        " AND (o.origin_lng - $this->current_lng) >= -(" . self::MAX_DISTANCE . ") ".
+        " AND (o.origin_lat - $this->current_lat) <= " . self::MAX_DISTANCE .
+        " AND (o.origin_lat - $this->current_lat) >= -(" . self::MAX_DISTANCE . ") " .
         " AND o.id NOT IN (" .
         "SELECT to.id FROM orders to WHERE " .
         " to.type='share' AND to.status='pending' " .
@@ -63,10 +63,10 @@ class order {
         $this->getPost();
         $query = "SELECT * FROM orders o WHERE " .
         " o.type='share' AND o.status='pending' ".
-        " AND (o.origin_lng - $this->current_lng) > $this->MAX_DISTANCE ".
-        " AND (o.origin_lng - $this->current_lng) < -($this->MAX_DISTANC) ".
-        " AND (o.origin_lat - $this->current_lat) > $this->MAX_DISTANC " .
-        " AND (o.origin_lat - $this->current_lat) < -($this->MAX_DISTANC) " .
+        " AND (o.origin_lng - $this->current_lng) > " . self::MAX_DISTANCE .
+        " AND (o.origin_lng - $this->current_lng) < -(" . self::MAX_DISTANCE . ")" .
+        " AND (o.origin_lat - $this->current_lat) > " . self::MAX_DISTANCE .
+        " AND (o.origin_lat - $this->current_lat) < -(" . self::MAX_DISTANCE . ") " .
         " AND o.id NOT IN (" .
         "SELECT to.id FROM orders to WHERE " .
         " to.type='share' AND to.status='pending' " .
@@ -150,7 +150,7 @@ class order {
     function getOrder($condition = ""){
         $this->getPost();
         //echo $_POST["id"];
-        $query = "SELECT * FROM orders";
+        $query = "SELECT * FROM orders ";
         $query2 .= cmdAddCond($query2, "and", "equal", array("id",$this->id));
         $query2 .= cmdAddCond($query2, "and", "equal", array("type",$this->type));
         $query2 .= cmdAddCond($query2, "and","equal",array("origin",$this->origin));
@@ -168,7 +168,8 @@ class order {
             $query .= " WHERE " . $query2 . " " . $condition;
         else if ($condition)
             $query .= $condition;
-        
+            
+        //echo $query;
         $items = $this->returnOrders($query);
         //print_r($items);
         if (count($items) > 0)
