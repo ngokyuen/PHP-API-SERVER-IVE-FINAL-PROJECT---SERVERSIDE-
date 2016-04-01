@@ -64,17 +64,16 @@ class order {
         $query = "SELECT * FROM orders o WHERE " .
         " o.type='share' AND o.status='pending' ".
         " AND (o.origin_lng - $this->current_lng) > " . self::MAX_DISTANCE .
-        " AND (o.origin_lng - $this->current_lng) < -(" . self::MAX_DISTANCE . ")" .
+        " AND (o.origin_lng - $this->current_lng) < -" . self::MAX_DISTANCE .
         " AND (o.origin_lat - $this->current_lat) > " . self::MAX_DISTANCE .
-        " AND (o.origin_lat - $this->current_lat) < -(" . self::MAX_DISTANCE . ") " .
+        " AND (o.origin_lat - $this->current_lat) < -" . self::MAX_DISTANCE .
         " AND o.id NOT IN (" .
-        "SELECT to.id FROM orders to WHERE " .
-        " to.type='share' AND to.status='pending' " .
-        " AND (to.user_id=$this->user_id " .
+        " SELECT o2.id FROM orders o2 WHERE " .
+        " o2.type = 'share' AND o2.status = 'pending' " .
+        " AND (o2.user_id = $this->user_id " .
         " OR (SELECT 1 FROM users_join_orders uo WHERE " .
-        " uo.user_id=$this->user_id " .
-        " AND uo.order_id =to.id))";
-        ");";
+        " uo.user_id = $this->user_id " .
+        " AND uo.order_id = o2.id)));";
         //echo $query;
         $items = $this->returnOrders($query);
         //print_r($items);
@@ -248,6 +247,9 @@ if (isset($_POST["action2"])){
     //$order->getOrder();
     
     switch($_POST["action2"]){
+        case "getOtherShareOrder":
+            $response = $order->getOtherShareOrder();
+        break;
         case "getJoinShareOrder":
             $response = $order->getJoinShareOrder();
         break;
@@ -266,12 +268,6 @@ if (isset($_POST["action2"])){
         case "getOrder":
             $response = $order->getOrder();
         break;
-		case "getGeneralOrder": //2016-03-10
-			$response = $order->getGeneralOrder();
-		break;
-		case "modifyGeneralOrderDistrict": //2016-03-11
-			$respone = $order->modifyGeneralOrder();
-		break;
     }
 }
 
