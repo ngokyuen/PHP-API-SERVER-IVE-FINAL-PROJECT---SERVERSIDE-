@@ -2,28 +2,17 @@
 
 //build class
 class order {
+    private const $MAX_DISTANCE = 0.8;
     private $SQL;
-    private $type;
-    private $origin;
-	private $origin_remark;
-    private $destination;
-	private $destination_remark;
-    private $book_date;
-	private $passenger;
-    private $contact_person;
-	private $contact_no;
-    private $token;
-    private $user_id;
-    private $created_date;
-    private $modified_date;
+    private $type, $origin,$origin_remark;
+    private $destination,$destination_remark;
+	private $passenger, $contact_person, $contact_no;
+    private $token,$user_id,$id;
+    private $book_date, $created_date,$modified_date;
     private $status;
-    private $id;
-    private $origin_lat;
-    private $origin_lng;
-    private $destination_lat;
-    private $destination_lng;
-    private $current_lng;
-    private $current_lat;
+    private $origin_lat,$origin_lng;
+    private $destination_lat,$destination_lng;
+    private $current_lng,$current_lat;
     
     function order($SQL){
         $this->SQL = $SQL;
@@ -50,17 +39,17 @@ class order {
         $this->getPost();
         $query = "SELECT * FROM orders o WHERE " .
         " o.type='share' AND o.status='pending' ".
-        " AND (o.origin_lng - $this->current_lng) <= 0.08 ".
-        " AND (o.origin_lng - $this->current_lng) >= -0.08 ".
-        " AND (o.origin_lat - $this->current_lat) <= 0.08 " .
-        " AND (o.origin_lat - $this->current_lat) >= -0.08 " .
-        " AND NOT IN (" .
-        "SELECT o.id FROM orders o WHERE " .
-        " o.type='share' AND o.status='pending' " .
-        " AND (o.user_id=$this->user_id " .
+        " AND (o.origin_lng - $this->current_lng) <= $this->MAX_DISTANCE ".
+        " AND (o.origin_lng - $this->current_lng) >= -($this->MAX_DISTANC) ".
+        " AND (o.origin_lat - $this->current_lat) <= $this->MAX_DISTANC " .
+        " AND (o.origin_lat - $this->current_lat) >= -($this->MAX_DISTANC) " .
+        " AND o.id NOT IN (" .
+        "SELECT to.id FROM orders to WHERE " .
+        " to.type='share' AND to.status='pending' " .
+        " AND (to.user_id=$this->user_id " .
         " OR (SELECT 1 FROM users_join_orders uo WHERE " .
         " uo.user_id=$this->user_id " .
-        " AND uo.order_id =o.id))";
+        " AND uo.order_id =to.id))";
         ");";
 
         $items = $this->returnOrders($query);
@@ -73,11 +62,19 @@ class order {
     function getOtherShareOrder(){
         $this->getPost();
         $query = "SELECT * FROM orders o WHERE " .
-        " o.type='share' AND o.status='pending' " .
-        " AND (o.user_id <> $this->user_id " .
-        " AND (SELECT 1 FROM users_join_orders uo WHERE " .
-        " uo.user_id <> $this->user_id " .
-        " AND uo.order_id = o.id))";
+        " o.type='share' AND o.status='pending' ".
+        " AND (o.origin_lng - $this->current_lng) > $this->MAX_DISTANCE ".
+        " AND (o.origin_lng - $this->current_lng) < -($this->MAX_DISTANC) ".
+        " AND (o.origin_lat - $this->current_lat) > $this->MAX_DISTANC " .
+        " AND (o.origin_lat - $this->current_lat) < -($this->MAX_DISTANC) " .
+        " AND o.id NOT IN (" .
+        "SELECT to.id FROM orders to WHERE " .
+        " to.type='share' AND to.status='pending' " .
+        " AND (to.user_id=$this->user_id " .
+        " OR (SELECT 1 FROM users_join_orders uo WHERE " .
+        " uo.user_id=$this->user_id " .
+        " AND uo.order_id =to.id))";
+        ");";
         //echo $query;
         $items = $this->returnOrders($query);
         //print_r($items);
@@ -179,65 +176,6 @@ class order {
         else
             return array("result"=>false);
     }
-	
-	//2016-03-10
-	//get General Order
-	function getGeneralOrder(){
-		$token = isset($_POST['token']) ? mysqli_real_escape_string($this->SQL, $_POST['token']) : ""; //client send
-		$type = isset($_POST['type']) ? mysqli_real_escape_string($this->SQL, $_POST['type']) : ""; //client send
-		
-		//get token
-		if ($token != ""){
-            $query = "SELECT * FROM users WHERE token ='$token';";
-            $result = mysqli_query($this->SQL, $query);
-            $row = mysqli_fetch_assoc($result);
-            //$user_id = $row["id"];   
-        }
-		
-		//loop get data limit 5 orders
-		$query = "SELECT id, type, book_date, origin, destination, passenger, status FROM orders Order BY book_date LIMIT 5;";
-		if ($result = mysqli_query($this->SQL, $query)) {
-			//loop begin
-            $orders = array();
-			while ($order_id = mysqli_fetch_array($result)) { //change to _array, non-finish
-				$order =  array("id"=>$id,"type"=>$type,"book_date"=>$book_date,
-                "origin"=>$origin, "origin"=>$origin,"destination"=>$destination, "passenger"=>$passenger,
-                "status"=>$status);
-                array_push($orders, $order);
-		      }
-			mysqli_free_result($result);
-			return array ("result"=>true, "content"=>$orders);
-        } else
-            return array("result"=>false);
-	}
-
-	//2016-03-11
-	//modifyGeneralOrderDistrict - non-finish
-	function modifyGeneralOrderDistrict() {
-		$token = isset($_POST['token']) ? mysqli_real_escape_string($this->SQL, $_POST['token']) : ""; //client send
-		$id = isset($_POST['id']) ? mysqli_real_escape_string($this->SQL, $_POST['id']) : ""; //client send
-		
-		//get token
-		if ($token != ""){
-            $query = "SELECT * FROM users WHERE token ='$token';";
-            $result = mysqli_query($this->SQL, $query);
-            $row = mysqli_fetch_assoc($result);
-            //$user_id = $row["id"];   
-        }
-		
-		//loop get data check status != 'completed' OR 'cancel' (limit 5), if pending return true
-		if ($status != 'completed' || $status != 'cancel'){ //pending return true, exec data (limit 5)
-			$query = "SELECT  status, book_date, origin, destination FROM orders Order BY book_date LIMIT 5;";
-			$result = mysqli_query($this->SQL, $query);
-		} 
-		else 
-		{
-			return array("result"=>false);
-		}
-		//non-finish
-        $query = "UPDATE orders SET origin='".$_POST['origin']."', destination='".$_POST['destination']."' where id = '$id';";
-        return array("result"=>true);
-	}
     
     //13 March 2016 Ted
     //general post method variable
@@ -279,40 +217,6 @@ class order {
         return $items;
     }
     
-    function updateLatLng(){
-        $origin = $this->getLatLng($this->origin);
-        $this->origin_lat = $origin["latitude"];
-        $this->origin_lng = $origin["longitude"];
-        $destination = $this->getLatLng($this->destination);
-        $this->destination_lat = $destination["latitude"];
-        $this->destination_lng = $destination["longitude"];
-    }
-    
-    function getLatLng($address){
-        $details_url = "https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyBdjpXiWO1TH0AgzoMhbzVAqZlQjhFxN8M&address=" . $address;
-        
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $details_url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        $response = json_decode(curl_exec($ch), true);
- 
-        // If Status Code is ZERO_RESULTS, OVER_QUERY_LIMIT, REQUEST_DENIED or INVALID_REQUEST
-        if ($response['status'] != 'OK') {
-            return null;
-        }
- 
-        $geometry = $response['results'][0]['geometry'];
-        $longitude = $geometry['location']['lng'];
-        $latitude = $geometry['location']['lat'];
- 
-        $array = array(
-            'latitude' => $geometry['location']['lat'],
-            'longitude' => $geometry['location']['lng'],
-            'location_type' => $geometry['location_type'],
-        );
- 
-        return $array;
-    }
 }
 
 function cmdAddCond($cond_query, $cmd, $cmd2, $conds){
