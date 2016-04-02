@@ -2,7 +2,7 @@
 
 //build class
 class order {
-    const MAX_DISTANCE = 0.8;
+    const MAX_DISTANCE = 0.05;
     private $SQL;
     private $type, $origin,$origin_remark;
     private $destination,$destination_remark;
@@ -12,7 +12,7 @@ class order {
     private $status;
     private $origin_lat,$origin_lng;
     private $destination_lat,$destination_lng;
-    private $current_lng,$current_lat;
+    private $current_lng,$current_lat = 0;
     
     function order($SQL){
         $this->SQL = $SQL;
@@ -39,19 +39,17 @@ class order {
         $this->getPost();
         $query = "SELECT * FROM orders o WHERE " .
         " o.type='share' AND o.status='pending' ".
-        " AND (o.origin_lng - $this->current_lng) <= " . self::MAX_DISTANCE .
-        " AND (o.origin_lng - $this->current_lng) >= -(" . self::MAX_DISTANCE . ") ".
-        " AND (o.origin_lat - $this->current_lat) <= " . self::MAX_DISTANCE .
-        " AND (o.origin_lat - $this->current_lat) >= -(" . self::MAX_DISTANCE . ") " .
+        " AND ABS(o.origin_lng - $this->current_lng) <= " . self::MAX_DISTANCE .
+        " AND ABS(o.origin_lat - $this->current_lat) <= " . self::MAX_DISTANCE .
         " AND o.id NOT IN (" .
-        "SELECT to.id FROM orders to WHERE " .
-        " to.type='share' AND to.status='pending' " .
-        " AND (to.user_id=$this->user_id " .
+        " SELECT o2.id FROM orders o2 WHERE " .
+        " o2.type='share' AND o2.status='pending' " .
+        " AND (o2.user_id=$this->user_id " .
         " OR (SELECT 1 FROM users_join_orders uo WHERE " .
         " uo.user_id=$this->user_id " .
-        " AND uo.order_id =to.id))";
-        ");";
+        " AND uo.order_id =o2.id)));";
 
+        //echo $query;
         $items = $this->returnOrders($query);
         if (count($items) > 0)
             return array("result"=>true, "content"=>$items);
@@ -63,10 +61,8 @@ class order {
         $this->getPost();
         $query = "SELECT * FROM orders o WHERE " .
         " o.type='share' AND o.status='pending' ".
-        " AND (o.origin_lng - $this->current_lng) > " . self::MAX_DISTANCE .
-        " AND (o.origin_lng - $this->current_lng) < -" . self::MAX_DISTANCE .
-        " AND (o.origin_lat - $this->current_lat) > " . self::MAX_DISTANCE .
-        " AND (o.origin_lat - $this->current_lat) < -" . self::MAX_DISTANCE .
+        " AND ABS(o.origin_lng - $this->current_lng) > " . self::MAX_DISTANCE .
+        " AND ABS(o.origin_lat - $this->current_lat) > " . self::MAX_DISTANCE .
         " AND o.id NOT IN (" .
         " SELECT o2.id FROM orders o2 WHERE " .
         " o2.type = 'share' AND o2.status = 'pending' " .
