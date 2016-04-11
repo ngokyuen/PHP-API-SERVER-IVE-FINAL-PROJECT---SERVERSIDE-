@@ -13,6 +13,7 @@ class order {
     private $origin_lat,$origin_lng;
     private $destination_lat,$destination_lng;
     private $current_lng,$current_lat = 0;
+    private $is_five = false;
     
     function order($SQL){
         $this->SQL = $SQL;
@@ -94,7 +95,8 @@ class order {
         " origin_lat='" .  $this->origin_lat . "'," .
         " origin_lng='" .  $this->origin_lng . "'," .
         " destination_lat='" .  $this->destination_lat . "', " .
-        " destination_lng='" .  $this->destination_lng . "' " .
+        " destination_lng='" .  $this->destination_lng . "', " .
+        " is_five=" .  $this->is_five .
         " WHERE id=" . $this->id;
         //echo $query;
         if (mysqli_query($this->SQL, $query))
@@ -110,11 +112,13 @@ class order {
             $this->type = 'normal';
         
         $query = "INSERT INTO orders (type, user_id, origin, destination, origin_remark" .
-        ", destination_remark, book_date, passenger, contact_person, contact_no, origin_lat, origin_lng, destination_lat, destination_lng) VALUES ('$this->type', " .
+        ", destination_remark, book_date, passenger, contact_person, contact_no, origin_lat, origin_lng, destination_lat, destination_lng, is_five) VALUES ('$this->type', " .
         (($this->user_id) ? $this->user_id :'NULL') .
         ",'$this->origin', '$this->destination', '$this->origin_remark'" .
         ", '$this->destination_remark', '$this->book_date', $this->passenger, '$this->contact_person', $this->contact_no" . 
-        ", '$this->origin_lat', '$this->origin_lng', '$this->destination_lat', '$this->destination_lng');";
+        ", '$this->origin_lat', '$this->origin_lng', '$this->destination_lat', '$this->destination_lng', " . 
+        (($this->is_five) ? $this->is_five :'NULL') .
+        ");";
         
         //echo $query;
         $result = mysqli_query($this->SQL, $query);
@@ -196,6 +200,7 @@ class order {
         $this->destination_lng = isset($_POST['destination_lng']) ? mysqli_real_escape_string($this->SQL, $_POST['destination_lng']) : "";
         $this->current_lng = isset($_POST['current_lng']) ? mysqli_real_escape_string($this->SQL, $_POST['current_lng']) : "";
         $this->current_lat = isset($_POST['current_lat']) ? mysqli_real_escape_string($this->SQL, $_POST['current_lat']) : "";
+        $this->is_five = isset($_POST['is_five']) ? mysqli_real_escape_string($this->SQL, $_POST['is_five']) : "";
         if ($this->token != ""){
             $query = "SELECT id FROM users WHERE token ='$this->token';";
             $result = mysqli_query($this->SQL, $query);

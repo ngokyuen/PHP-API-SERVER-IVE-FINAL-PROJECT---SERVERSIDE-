@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- 主機: localhost
--- 產生時間： 2016 年 03 月 28 日 22:00
+-- 產生時間： 2016 年 04 月 07 日 23:08
 -- 伺服器版本: 5.5.44-MariaDB-log
 -- PHP 版本： 5.5.31
 
@@ -36,17 +36,18 @@ CREATE TABLE IF NOT EXISTS `orders` (
   `origin_remark` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `destination_remark` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `book_date` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `passenger` int(11) NOT NULL COMMENT 'number of passenger',
+  `passenger` int(11) DEFAULT NULL COMMENT 'number of passenger',
   `contact_person` varchar(255) COLLATE utf8_bin NOT NULL,
   `contact_no` int(8) NOT NULL,
-  `origin_lat` float DEFAULT NULL,
-  `origin_lng` float DEFAULT NULL,
-  `destination_lat` float DEFAULT NULL,
-  `destination_lng` float DEFAULT NULL,
+  `origin_lat` double DEFAULT NULL,
+  `origin_lng` double DEFAULT NULL,
+  `destination_lat` double DEFAULT NULL,
+  `is_five` tinyint(1) NOT NULL DEFAULT '0',
+  `destination_lng` double DEFAULT NULL,
   `created_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `modified_date` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=7 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=40 ;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
