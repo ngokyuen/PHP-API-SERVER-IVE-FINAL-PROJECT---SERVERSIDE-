@@ -19,13 +19,37 @@ class order {
         $this->SQL = $SQL;
     }
     
+    function joinShareOrder(){
+        $this->getPost();
+        $query = "INSERT INTO users_join_orders (user_id, order_id) VALUES (" .
+        "'$this->user_id', '$this->id')";
+        
+        $result = mysqli_query($this->SQL, $query);
+        if ($order_id = mysqli_insert_id($this->SQL))
+            return array("result"=>true);
+        else
+            return array("result"=>false);
+    }
+    
+    function outShareOrder(){
+        $this->getPost();
+        $query = "UPDATE users_join_orders SET status='cancel' WHERE order_id=" .
+        "'$this->id' AND user_id='$this->user_id'";
+        
+        $result = mysqli_query($this->SQL, $query);
+        if (mysqli_affected_rows() != 0)
+            return array("result"=>true);
+        else
+            return array("result"=>false);
+    }
+    
     function getJoinShareOrder(){
         $this->getPost();
         $query = "SELECT * FROM orders o WHERE " .
         " o.type='share' AND o.status='pending' " .
         " AND (o.user_id=$this->user_id " .
         " OR (SELECT 1 FROM users_join_orders uo WHERE " .
-        " uo.user_id=$this->user_id " .
+        " uo.user_id=$this->user_id and uo.status='join'" .
         " AND uo.order_id =o.id))";
         //echo $query;
         $items = $this->returnOrders($query);
@@ -47,7 +71,7 @@ class order {
         " o2.type='share' AND o2.status='pending' " .
         " AND (o2.user_id=$this->user_id " .
         " OR (SELECT 1 FROM users_join_orders uo WHERE " .
-        " uo.user_id=$this->user_id " .
+        " uo.user_id=$this->user_id and status='join'" .
         " AND uo.order_id =o2.id)));";
 
         //echo $query;
@@ -69,7 +93,7 @@ class order {
         " o2.type = 'share' AND o2.status = 'pending' " .
         " AND (o2.user_id = $this->user_id " .
         " OR (SELECT 1 FROM users_join_orders uo WHERE " .
-        " uo.user_id = $this->user_id " .
+        " uo.user_id = $this->user_id and status='join'" .
         " AND uo.order_id = o2.id)));";
         //echo $query;
         $items = $this->returnOrders($query);
@@ -248,6 +272,12 @@ if (isset($_POST["action2"])){
     //$order->getOrder();
     
     switch($_POST["action2"]){
+        case "joinShareOrder":
+            $response = $order->joinShareOrder();
+        break;
+        case "outShareOrder":
+            $response = $order->outShareOrder();
+        break;
         case "getOtherShareOrder":
             $response = $order->getOtherShareOrder();
         break;
