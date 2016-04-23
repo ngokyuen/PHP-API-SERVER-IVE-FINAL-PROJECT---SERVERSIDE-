@@ -2,20 +2,29 @@
 
 class Profile {
     private $SQL;
-    private $last_name;
-    private $first_name;
+    private $last_name,$first_name;
     private $home_no;
     private $email;
-    private $address;
-    private $address2;
+    private $address,$address2;
     private $sex;
     private $id;
     private $token;
+    //for upload/download image
+    private $img;
     
     private $result;
     
     function Profile($sql){
         $this->SQL = $sql;
+    }
+    
+    function uploadProfileImage(){
+        $this->getPost();
+        $binary=base64_decode($img);
+        $file = fopen('img/' . $this->id . '.png', 'wb');
+        fwrite($file, $binary);
+        fclose($file);
+        return array("result"=>true);
     }
     
     function modifyProfile(){
@@ -67,6 +76,8 @@ class Profile {
             $this->result = mysqli_fetch_assoc($result);
             $this->id = $this->result["id"];
         }
+        //for download/upload image
+        $this->img = isset($_POST['img']) ? mysqli_real_escape_string($this->SQL, $_POST['img']) : "";
     }
 }
 
@@ -81,6 +92,9 @@ if (isset($_POST["action2"])){
         break;
         case "getProfile":
             $response = $profile->getProfile();
+        break;
+        case "uploadProfileImage":
+            $response = $profile->uploadProfileImage();
         break;
     }
 }
