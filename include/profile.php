@@ -20,9 +20,10 @@ class Profile {
     
     function uploadProfileImage(){
         $this->getPost();
-        $binary=base64_decode($img);
+        //$binary=base64_decode($this->img);
         $file = fopen('img/' . $this->id . '.png', 'wb');
-        fwrite($file, $binary);
+        //fwrite($file, $binary);
+        fwrite($file, $this->img);
         fclose($file);
         return array("result"=>true);
     }
