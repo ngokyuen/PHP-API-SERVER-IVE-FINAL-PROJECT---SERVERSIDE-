@@ -21,11 +21,21 @@ class Profile {
     function uploadProfileImage(){
         $this->getPost();
         //$binary=base64_decode($this->img);
-        $file = fopen('img/' . $this->id . '.png', 'wb');
+        //header('Content-Type: bitmap; charset=utf-8');
+        $file = fopen('img/' . $this->id, 'wb');
         //fwrite($file, $binary);
         fwrite($file, $this->img);
         fclose($file);
         return array("result"=>true);
+    }
+    
+    function downloadProfileImage(){
+        $this->getPost();
+        $file = file_get_contents('img/' . $this->id);
+        if ($file)
+            return array("result"=>true, "content"=>array("img"=>$file));
+        else
+            return array("result"=>false);
     }
     
     function modifyProfile(){
@@ -97,10 +107,13 @@ if (isset($_POST["action2"])){
         case "uploadProfileImage":
             $response = $profile->uploadProfileImage();
         break;
+        case "downloadProfileImage":
+            $response = $profile->downloadProfileImage();
+        break;
     }
+    
+    
+    echo json_encode($response);    
 }
-
-echo json_encode($response);
-
 
 ?>
