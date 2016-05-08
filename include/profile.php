@@ -20,12 +20,23 @@ class Profile {
     
     function uploadProfileImage(){
         $this->getPost();
-        //$binary=base64_decode($this->img);
-        //header('Content-Type: bitmap; charset=utf-8');
-        $file = fopen('img/' . $this->id, 'wb');
-        //fwrite($file, $binary);
-        fwrite($file, $this->img);
-        fclose($file);
+        
+        //$file = fopen('img/' . $this->id. ".png", 'wb');
+        $img_data_binary = base64_decode($this->img);
+        $source_img = imagecreatefromstring($img_data_binary);
+        
+          ob_clean();
+          ob_start();
+          header('Content-Type: image/png');
+          imagepng($source_img);
+          $contents = ob_get_clean();
+
+         //file_put_contents("img/" . $this->id . ".png", $contents);
+        //imagepng($source_img, "img/" . $this->id . ".png");
+        //imagedestroy($source_img);
+        $file = fopen("img/" . $this->id . ".png", "wb");
+         fwrite($file, $contents);
+         fclose($file);
         return array("result"=>true);
     }
     
@@ -88,7 +99,7 @@ class Profile {
             $this->id = $this->result["id"];
         }
         //for download/upload image
-        $this->img = isset($_POST['img']) ? mysqli_real_escape_string($this->SQL, $_POST['img']) : "";
+        $this->img = isset($_POST['img']) ? str_replace(" ", "+", $_POST['img']) : "";
     }
 }
 
