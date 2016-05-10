@@ -21,8 +21,9 @@ class order {
     
     function joinShareOrder(){
         $this->getPost();
-        $query = "INSERT INTO users_join_orders (user_id, order_id) VALUES (" .
-        "'$this->user_id', '$this->id')";
+        $query = "INSERT IGNORE INTO users_join_orders (user_id, order_id) VALUES (" .
+        "'$this->user_id', '$this->id') SELECT id FROM users_join_orders WHERE " .
+        "user_id='$this->user_id' AND order_id='$this->id';" ;
         
         $result = mysqli_query($this->SQL, $query);
         if ($order_id = mysqli_insert_id($this->SQL))
