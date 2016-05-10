@@ -112,17 +112,18 @@ class order {
 	    " origin_remark='" .  $this->origin_remark . "'," .
         " destination='" .  $this->destination . "'," .
         " destination_remark='" .  $this->destination_remark . "'," .
-        " book_date='" .  $this->book_date . "'," .
-        " passenger='" .  $this->passenger . "'," .
+        " book_date='" .  $this->book_date . "',";
+        
+        " passenger='" .  (!empty($this->passenger) ? $this->passenger : 'NULL') . "'," .
         " contact_person='" .  $this->contact_person . "'," .
         " contact_no='" .  $this->contact_no . "'," .
         " origin_lat='" .  $this->origin_lat . "'," .
         " origin_lng='" .  $this->origin_lng . "'," .
         " destination_lat='" .  $this->destination_lat . "', " .
         " destination_lng='" .  $this->destination_lng . "', " .
-        " is_five=" .  $this->is_five .
+        " is_five=" . (($this->is_five) ? $this->is_five :'NULL') .
         " WHERE id=" . $this->id;
-        //echo $query;
+        echo $query;
         if (mysqli_query($this->SQL, $query))
             return array("result"=>true);
         else
@@ -139,7 +140,7 @@ class order {
         ", destination_remark, book_date, passenger, contact_person, contact_no, origin_lat, origin_lng, destination_lat, destination_lng, is_five) VALUES ('$this->type', " .
         (($this->user_id) ? $this->user_id :'NULL') .
         ",'$this->origin', '$this->destination', '$this->origin_remark'" .
-        ", '$this->destination_remark', '$this->book_date', $this->passenger, '$this->contact_person', $this->contact_no" . 
+        ", '$this->destination_remark', '$this->book_date', " . (!empty($this->passenger) ? $this->passenger : 'NULL') . ", '$this->contact_person', $this->contact_no" . 
         ", '$this->origin_lat', '$this->origin_lng', '$this->destination_lat', '$this->destination_lng', " . 
         (($this->is_five) ? $this->is_five :'NULL') .
         ");";
