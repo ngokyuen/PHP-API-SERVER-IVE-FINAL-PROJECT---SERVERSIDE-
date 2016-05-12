@@ -42,11 +42,14 @@ class Profile {
     
     function downloadProfileImage(){
         $this->getPost();
-        $file = file_get_contents('img/' . $this->id);
-        if ($file)
-            return array("result"=>true, "content"=>array("img"=>$file));
-        else
-            return array("result"=>false);
+        ob_clean();
+        imagecreatefrompng('img/' . $this->id . '.png');
+        
+        // $file = file_get_contents('img/' . $this->id . '.png');
+        // if ($file)
+        //     return array("result"=>true, "content"=>array("img"=>$file));
+        // else
+        //     return array("result"=>false);
     }
     
     function modifyProfile(){
