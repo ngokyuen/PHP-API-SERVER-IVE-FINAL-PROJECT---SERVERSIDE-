@@ -22,6 +22,20 @@ class order {
         $this->SQL = $SQL;
     }
     
+    function getOrderJoinUserId(){
+        $this->getPost();
+        $query = "SELECT * FROM users_join_orders WHERE " .
+        "user_id='" . $this->user_id . "' AND order_id='" . $this->order_id . "'" .
+        " AND status='" . self::STATUS_JOIN . "';";
+        
+        $items = array();
+	    $result = mysqli_query($this->SQL, $query);
+        while ($item = mysqli_fetch_assoc($result)){
+            array_push($items, $item);
+        }
+        return $items;
+    }
+    
     function joinShareOrder(){
         $this->getPost();
         $query = "INSERT INTO users_join_orders (user_id, order_id)"  .
@@ -278,6 +292,9 @@ if (isset($_POST["action2"])){
     //$order->getOrder();
     
     switch($_POST["action2"]){
+        case "getOrderJoinUserId":
+            $response = $order->getOrderJoinUserId();
+        break;
         case "joinShareOrder":
             $response = $order->joinShareOrder();
         break;
