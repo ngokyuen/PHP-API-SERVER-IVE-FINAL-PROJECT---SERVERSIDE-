@@ -3,6 +3,8 @@
 //build class
 class order {
     const MAX_DISTANCE = 0.05;
+    const STATUS_JOIN = "join";
+    const STATUS_CANCEL = "cancel";
     private $SQL;
     private $type, $origin,$origin_remark;
     private $destination,$destination_remark;
@@ -15,15 +17,17 @@ class order {
     private $current_lng,$current_lat = 0;
     private $is_five = false;
     
+    
     function order($SQL){
         $this->SQL = $SQL;
     }
     
     function joinShareOrder(){
         $this->getPost();
-        $query = "INSERT IGNORE INTO users_join_orders (user_id, order_id) VALUES (" .
-        "'$this->user_id', '$this->id') SELECT id FROM users_join_orders WHERE " .
-        "user_id='$this->user_id' AND order_id='$this->id';" ;
+        $query = "INSERT INTO users_join_orders (user_id, order_id)"  .
+        " SELECT '$this->user_id', '$this->id' FROM dual WHERE NOT EXISTS " .
+        "(SELECT * FROM users_join_orders WHERE " .
+        " user_id='$this->user_id' AND order_id='$this->id' AND status='" . self::STATUS_JOIN . "');" ;
         
         $result = mysqli_query($this->SQL, $query);
         if ($order_id = mysqli_insert_id($this->SQL))
@@ -35,10 +39,10 @@ class order {
     function outShareOrder(){
         $this->getPost();
         $query = "UPDATE users_join_orders SET status='cancel' WHERE order_id=" .
-        "'$this->id' AND user_id='$this->user_id'";
+        "'$this->id' AND user_id='$this->user_id' AND status='" . self::STATUS_JOIN . "'";
         
         $result = mysqli_query($this->SQL, $query);
-        if (mysqli_affected_rows() != 0)
+        if (mysqli_affected_rows($this->SQL))
             return array("result"=>true);
         else
             return array("result"=>false);
