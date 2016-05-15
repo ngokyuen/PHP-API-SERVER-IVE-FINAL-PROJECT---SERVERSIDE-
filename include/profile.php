@@ -42,9 +42,14 @@ class Profile {
     
     function downloadProfileImage(){
         $this->getPost();
+        $im = imagecreatefrompng('img/' . $this->id . '.png');
         ob_clean();
-        imagecreatefrompng('img/' . $this->id . '.png');
-        
+        ob_start();
+        header( "Content-type: image/png" );
+        imagepng($im);
+        imagedestroy($im);
+        $contents = ob_get_clean();
+        echo base64_encode($contents);
         // $file = file_get_contents('img/' . $this->id . '.png');
         // if ($file)
         //     return array("result"=>true, "content"=>array("img"=>$file));
@@ -122,12 +127,12 @@ if (isset($_POST["action2"])){
             $response = $profile->uploadProfileImage();
         break;
         case "downloadProfileImage":
-            $response = $profile->downloadProfileImage();
+            $profile->downloadProfileImage();
         break;
     }
     
-    
-    echo json_encode($response);    
+    if ($_POST["action2"] != "downloadProfileImage")
+        echo json_encode($response);    
 }
 
 ?>
