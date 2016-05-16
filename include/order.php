@@ -25,15 +25,14 @@ class order {
     function getOrderJoinUserId(){
         $this->getPost();
         $query = "SELECT * FROM users_join_orders WHERE " .
-        "user_id='" . $this->user_id . "' AND order_id='" . $this->order_id . "'" .
+        " order_id='" . $this->id . "'" .
         " AND status='" . self::STATUS_JOIN . "';";
-        
-        $items = array();
-	    $result = mysqli_query($this->SQL, $query);
-        while ($item = mysqli_fetch_assoc($result)){
-            array_push($items, $item);
-        }
-        return $items;
+        //echo $query;
+        $items = $this->returnOrders($query);
+        if (count($items) > 0)
+            return array("result"=>true, "content"=>$items);
+        else
+            return array("result"=>false);
     }
     
     function joinShareOrder(){
