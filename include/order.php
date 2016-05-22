@@ -70,7 +70,7 @@ class order {
     function getJoinShareOrder(){
         $this->getPost();
         $query = "SELECT * FROM orders o WHERE " .
-        " o.type='share' AND o.status='pending' " .
+        " o.type='share' AND (o.status='pending' OR o.status='accept') " .
         " AND (o.user_id=$this->user_id " .
         " OR (SELECT 1 FROM users_join_orders uo WHERE " .
         " uo.user_id=$this->user_id and uo.status='join'" .
@@ -87,7 +87,7 @@ class order {
     function getNearShareOrder(){
         $this->getPost();
         $query = "SELECT * FROM orders o WHERE " .
-        " o.type='share' AND o.status='pending' ".
+        " o.type='share' AND (o.status='pending' OR o.status='accept') ".
         " AND ABS(o.origin_lng - $this->current_lng) <= " . self::MAX_DISTANCE .
         " AND ABS(o.origin_lat - $this->current_lat) <= " . self::MAX_DISTANCE .
         " AND o.id NOT IN (" .
@@ -109,7 +109,7 @@ class order {
     function getOtherShareOrder(){
         $this->getPost();
         $query = "SELECT * FROM orders o WHERE " .
-        " o.type='share' AND o.status='pending' ".
+        " o.type='share' AND (o.status='pending' OR o.status='accept') ".
         " AND ABS(o.origin_lng - $this->current_lng) > " . self::MAX_DISTANCE .
         " AND ABS(o.origin_lat - $this->current_lat) > " . self::MAX_DISTANCE .
         " AND o.id NOT IN (" .
@@ -194,6 +194,38 @@ class order {
             return array("result"=>false);
     }
     
+    function getProgressOrder(){
+         $this->getPost();
+         $query = "SELECT * FROM orders o WHERE " .
+         " (o.user_id='" . $this->user_id . "'" .
+         " AND (o.status='pending' OR o.status='accept') AND o.book_date >= NOW()) OR (o.id in (" .
+         " SELECT order_id FROM users_join_orders WHERE user_id='" . 
+         $this->user_id . "' ) AND o.book_date >= NOW());";
+         
+         $items = $this->returnOrders($query);
+        //print_r($items);
+        if (count($items) > 0)
+            return array("result"=>true, "content"=>$items);
+        else
+            return array("result"=>false);
+    }
+
+    function getPassOrder(){
+         $this->getPost();
+         $query = "SELECT * FROM orders o WHERE " .
+         " (o.user_id='" . $this->user_id . "'" .
+         " AND o.book_date < NOW()) OR (o.id in (" .
+         " SELECT order_id FROM users_join_orders WHERE user_id='" . 
+         $this->user_id . "' ) AND o.book_date < NOW());";
+         
+         $items = $this->returnOrders($query);
+        //print_r($items);
+        if (count($items) > 0)
+            return array("result"=>true, "content"=>$items);
+        else
+            return array("result"=>false);
+    }
+
     //13 March 2016 Ted
     function getOrder($condition = ""){
         $this->getPost();
@@ -297,6 +329,12 @@ if (isset($_POST["action2"])){
     //$order->getOrder();
     
     switch($_POST["action2"]){
+        case "getPassOrder":
+            $response = $order->getPassOrder();
+        break;
+        case "getProgressOrder":
+            $response = $order->getProgressOrder();
+        break;
         case "getOrderJoinUserId":
             $response = $order->getOrderJoinUserId();
         break;
