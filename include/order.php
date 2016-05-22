@@ -28,9 +28,15 @@ class order {
         " order_id='" . $this->id . "'" .
         " AND status='" . self::STATUS_JOIN . "';";
         //echo $query;
-        $items = $this->returnOrders($query);
-        if (count($items) > 0)
-            return array("result"=>true, "content"=>$items);
+        $user_join_orders = $this->returnOrders($query);
+        
+        $query = "SELECT * FROM orders WHERE " .
+        "id='" . $this->id . "';";
+        $orders = $this->returnOrders($query);
+        array_unshift($user_join_orders, $orders[0]);
+        
+        if (count($user_join_orders) > 0)
+            return array("result"=>true, "content"=>$user_join_orders);
         else
             return array("result"=>false);
     }
