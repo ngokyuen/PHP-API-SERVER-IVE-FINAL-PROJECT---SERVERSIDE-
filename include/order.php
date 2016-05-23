@@ -203,6 +203,19 @@ class order {
         else
             return array("result"=>false);
     }
+    
+    function viewOrder(){
+        $this->getPost();
+        $query = "SELECT (4 - COUNT(uo.id) - o.passenger) as remain_seat, o.* FROM orders o LEFT JOIN users_join_orders uo ON (uo.order_id = o.id)" .
+         " WHERE o.id='" . $this->id .  "' GROUP BY o.id;";
+        
+         $items = $this->returnOrders($query);
+        //print_r($items);
+        if (count($items) > 0)
+            return array("result"=>true, "content"=>$items);
+        else
+            return array("result"=>false);
+    }
 
     //13 March 2016 Ted
     function getOrder($condition = ""){
@@ -342,6 +355,9 @@ if (isset($_POST["action2"])){
 		break;
         case "getOrder":
             $response = $order->getOrder();
+        break;
+        case "viewOrder":
+            $response = $order->viewOrder();
         break;
     }
 }
