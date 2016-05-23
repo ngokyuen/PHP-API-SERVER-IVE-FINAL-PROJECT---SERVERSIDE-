@@ -69,12 +69,12 @@ class order {
     
     function getJoinShareOrder(){
         $this->getPost();
-        $query = "SELECT * FROM orders o WHERE " .
-        " o.type='share' AND (o.status='pending' OR o.status='accept') " .
+        $query = "SELECT o.*, (4 - o.passenger - count(uo2.id)) as remain_seat FROM orders o, users_join_orders uo2  WHERE " .
+        " o.id=uo2.order_id AND o.type='share' AND (o.status='pending' OR o.status='accept') " .
         " AND (o.user_id=$this->user_id " .
         " OR (SELECT 1 FROM users_join_orders uo WHERE " .
         " uo.user_id=$this->user_id and uo.status='join'" .
-        " AND uo.order_id =o.id))";
+        " AND uo.order_id =o.id))  GROUP BY uo2.order_id;";
         //echo $query;
         $items = $this->returnOrders($query);
         //print_r($items);
@@ -86,8 +86,8 @@ class order {
     
     function getNearShareOrder(){
         $this->getPost();
-        $query = "SELECT * FROM orders o WHERE " .
-        " o.type='share' AND (o.status='pending' OR o.status='accept') ".
+        $query = "SELECT o.*, (4 - o.passenger - count(uo2.id)) as remain_seat  FROM orders o, users_join_orders uo2 WHERE " .
+        " o.id=uo2.order_id AND o.type='share' AND (o.status='pending' OR o.status='accept') ".
         " AND ABS(o.origin_lng - $this->current_lng) <= " . self::MAX_DISTANCE .
         " AND ABS(o.origin_lat - $this->current_lat) <= " . self::MAX_DISTANCE .
         " AND o.id NOT IN (" .
@@ -96,7 +96,7 @@ class order {
         " AND (o2.user_id=$this->user_id " .
         " OR (SELECT 1 FROM users_join_orders uo WHERE " .
         " uo.user_id=$this->user_id and status='join'" .
-        " AND uo.order_id =o2.id)));";
+        " AND uo.order_id =o2.id))) GROUP BY uo2.order_id;";
 
         //echo $query;
         $items = $this->returnOrders($query);
@@ -108,8 +108,8 @@ class order {
     
     function getOtherShareOrder(){
         $this->getPost();
-        $query = "SELECT * FROM orders o WHERE " .
-        " o.type='share' AND (o.status='pending' OR o.status='accept') ".
+        $query = "SELECT o.*, (4 - o.passenger - count(uo2.id)) as remain_seat  FROM orders o, users_join_orders uo2 WHERE " .
+        " o.id=uo2.order_id AND o.type='share' AND (o.status='pending' OR o.status='accept') ".
         " AND ABS(o.origin_lng - $this->current_lng) > " . self::MAX_DISTANCE .
         " AND ABS(o.origin_lat - $this->current_lat) > " . self::MAX_DISTANCE .
         " AND o.id NOT IN (" .
@@ -118,7 +118,7 @@ class order {
         " AND (o2.user_id = $this->user_id " .
         " OR (SELECT 1 FROM users_join_orders uo WHERE " .
         " uo.user_id = $this->user_id and status='join'" .
-        " AND uo.order_id = o2.id)));";
+        " AND uo.order_id = o2.id)))  GROUP BY uo2.order_id;";
         //echo $query;
         $items = $this->returnOrders($query);
         //print_r($items);
