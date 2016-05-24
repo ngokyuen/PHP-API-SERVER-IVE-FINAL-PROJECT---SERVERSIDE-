@@ -118,8 +118,7 @@ class order {
 	    " origin_remark='" .  $this->origin_remark . "'," .
         " destination='" .  $this->destination . "'," .
         " destination_remark='" .  $this->destination_remark . "'," .
-        " book_date='" .  $this->book_date . "',";
-        
+        " book_date='" .  $this->book_date . "',".
         " passenger='" .  (!empty($this->passenger) ? $this->passenger : 'NULL') . "'," .
         " contact_person='" .  $this->contact_person . "'," .
         " contact_no='" .  $this->contact_no . "'," .
@@ -129,7 +128,7 @@ class order {
         " destination_lng='" .  $this->destination_lng . "', " .
         " is_five=" . (($this->is_five) ? $this->is_five :'NULL') .
         " WHERE id=" . $this->id;
-        echo $query;
+        //echo $query;
         if (mysqli_query($this->SQL, $query))
             return array("result"=>true);
         else
